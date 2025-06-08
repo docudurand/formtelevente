@@ -1,10 +1,10 @@
 import express from 'express';
-import cors from 'cors';
+import cors     from 'cors';
 import nodemailer from 'nodemailer';
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({limit:'15mb'}));   // 🔧
 
 const salesMap = {
   'Jean Dupont':   'd.pichard2007@gmail.com',
@@ -20,27 +20,31 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-app.post('/api/send-order', async (req, res) => {
-  const { client, salesperson, html } = req.body;
-
+app.post('/api/send-order', async (req,res)=>{
+  const { client, salesperson, pdf } = req.body;
+  if(!pdf)   return res.status(400).json({success:false,error:'no_pdf'});
   const to = salesMap[salesperson] || process.env.DEFAULT_TO;
-  if (!to) return res.status(400).json({ success:false, error:'no_recipient' });
+  if(!to)    return res.status(400).json({success:false,error:'no_recipient'});
 
-  const mailOptions = {
+  const mail = {
     from: `"Bon de Commande" <${process.env.GMAIL_USER}>`,
     to,
-    subject: `Nouveau bon de commande – ${client || 'Client inconnu'}`,
-    html
+    subject: `Nouveau BDC – ${client||'Client inconnu'}`,
+    text:    'Veuillez trouver le bon de commande en pièce jointe (PDF).',
+    attachments:[{
+      filename:'Bon_de_Commande.pdf',
+      content: Buffer.from(pdf,'base64'),
+      contentType:'application/pdf'
+    }]
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success:false, error:'email_failed' });
+  try{
+    await transporter.sendMail(mail);
+    res.json({success:true});
+  }catch(e){
+    console.error(e);
+    res.status(500).json({success:false,error:'email_failed'});
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('API prête sur le port', PORT));
+app.listen(process.env.PORT||3000,()=>console.log('API OK'));
