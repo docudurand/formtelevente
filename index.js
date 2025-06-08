@@ -7,9 +7,9 @@ app.use(cors());
 app.use(express.json({limit:'15mb'}));   // 🔧
 
 const salesMap = {
-  'Jean Dupont':   'd.pichard2007@gmail.com',
-  'Camille Martin':'magvl4gleize@durandservices.fr',
-  'Sarah Lopez':   'angeliquemanin@hotmail.fr'
+  'Casti Jeremy':   'comvl2miribel@durandservices.fr',
+  'Trenti Anthony':'comvlchassieu@durandservices.fr',
+  'Bazoge Ilona':   'comvl2chassieu@durandservices.fr'
 };
 
 const transporter = nodemailer.createTransport({
