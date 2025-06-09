@@ -37,7 +37,7 @@ app.post('/api/send-order', async (req, res) => {
     subject: `BDC - ${salesperson} – ${client || 'Client inconnu'}`,
     text: 'Veuillez trouver le bon de commande en pièce jointe (PDF).',
     attachments: [{
-      filename: `Bon_de_Commande_${salesperson} – ${client || 'Client inconnu'}.pdf`,
+      filename: `Bon ${salesperson} – ${client || 'Client inconnu'}.pdf`,
       content: Buffer.from(pdf, 'base64'),
       contentType: 'application/pdf'
     }]
