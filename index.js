@@ -30,10 +30,10 @@ app.post('/api/send-order', async (req,res)=>{
   const mail = {
     from: `"Bon de Commande" <${process.env.GMAIL_USER}>`,
     to,
-    subject: `Bon de commande de ${salesperson} – ${client || 'Client inconnu'}`,
+    subject: `BDC - ${salesperson} – ${client || 'Client inconnu'}`,
     text:    'Veuillez trouver le bon de commande en pièce jointe (PDF).',
     attachments:[{
-      filename:'Bon_de_Commande.pdf',
+      filename:'Bon_de_Commande ${client || 'Client inconnu'}.pdf',
       content: Buffer.from(pdf,'base64'),
       contentType:'application/pdf'
     }]
