@@ -14,7 +14,7 @@ const salesMap = {
   'Casti Jeremy':   'comvl2miribel@durandservices.fr',
   'Trenti Anthony': 'comvlchassieu@durandservices.fr',
   'Bazoge Ilona':   'comvl2chassieu@durandservices.fr',
-  'Pichard Damien': 'd.pichard2007@gmail.com'
+  'Pichard Damien': 'magvl4gleize@durandservices.fr'
 };
 
 const transporter = nodemailer.createTransport({
