@@ -1,12 +1,17 @@
+
 import express from 'express';
 import cors from 'cors';
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 
-const app = express();
-app.use(cors());
-app.use(express.json({ limit: '15mb' }));
+dotenv.config();
 
-app.get('/healthz', (_req, res) => {
+const router = express.Router();
+
+router.use(cors());
+router.use(express.json({ limit: '15mb' }));
+
+router.get('/healthz', (_req, res) => {
   res.sendStatus(200);
 });
 
@@ -25,13 +30,18 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-app.post('/api/send-order', async (req, res) => {
+router.post('/send-order', async (req, res) => {
   const { client, salesperson, pdf } = req.body;
-  if (!pdf) return res.status(400).json({ success: false, error: 'no_pdf' });
-  const to = salesMap[salesperson] || process.env.DEFAULT_TO;
-  if (!to) return res.status(400).json({ success: false, error: 'no_recipient' });
+  if (!pdf) {
+    return res.status(400).json({ success: false, error: 'no_pdf' });
+  }
 
-  const mail = {
+  const to = salesMap[salesperson] || process.env.DEFAULT_TO;
+  if (!to) {
+    return res.status(400).json({ success: false, error: 'no_recipient' });
+  }
+
+  const mailOptions = {
     from: `"Bon de Commande" <${process.env.GMAIL_USER}>`,
     to,
     subject: `BDC - ${salesperson} – ${client || 'Client inconnu'}`,
@@ -44,13 +54,12 @@ app.post('/api/send-order', async (req, res) => {
   };
 
   try {
-    await transporter.sendMail(mail);
-    res.json({ success: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ success: false, error: 'email_failed' });
+    await transporter.sendMail(mailOptions);
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Email send failed:', error);
+    return res.status(500).json({ success: false, error: 'email_failed' });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`API OK on port ${PORT}`));
+export default router;
